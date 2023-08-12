@@ -18,7 +18,7 @@ for vector in BitVectorList:
             DG.add_edge(edge[0], edge[1])
         else:
             DG.add_edge(edge[1], edge[0])
-    Digraph = np.array([[0] * m for i in range(n)]) 		#create the adjacency matrices for the digraphs
+    Digraph = np.array([[0] * n for i in range(n)]) 		#create the adjacency matrices for the digraphs
     for edge in DG.out_edges():
         Digraph[edge[0]][edge[1]] = 1
     #A = nx.adjacency_matrix(DG)
