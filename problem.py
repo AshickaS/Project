@@ -1,34 +1,38 @@
 import networkx as nx 
 import numpy as np
 import itertools
+from tabulate import tabulate
 
-AdjacencyMatrix = np.loadtxt('input1.txt')      #load the input file
-G = nx.Graph(AdjacencyMatrix)         #create a graph
+input_graph = np.loadtxt('input1.txt')      #load the input file
+G = nx.Graph(input_graph)         #create a graph
 m = G.number_of_edges()     #size of the graph
 n = G.number_of_nodes() 	#order of the graph
-f = open('output1.txt', 'w')
+f = open('output11.txt', 'w')
+F = nx.adjacency_matrix(G)      #create the adjacency matrix
+K = F.toarray()
+print(f'Input graph:\n\n {K}',file = f)         #print the input graph to the file
 print(f'The diameter of the input graph is {nx.diameter(G)}', file = f) 		#print the diameter
 diameters = []      #create a list for diameters
-BitVectorList = list(itertools.product(range(2), repeat=m))         #create a list of bit vectors
-for vector in BitVectorList:
+result = []
+bit_vector_list = list(itertools.product(range(2), repeat=m))         #create a list of bit vectors
+for vector in bit_vector_list:
     DG = nx.DiGraph() 		#create a digraph for each vector
+    DG.add_nodes_from([i for i in range (n)])
     for edge, bit in zip(G.edges(), vector): 		#orient the graph
     #    print(edge, bit)
         if bit == 0:
             DG.add_edge(edge[0], edge[1])
         else:
             DG.add_edge(edge[1], edge[0])
-    Digraph = np.array([[0] * n for i in range(n)]) 		#create the adjacency matrices for the digraphs
-    for edge in DG.out_edges():
-        Digraph[edge[0]][edge[1]] = 1
-    #A = nx.adjacency_matrix(DG)
-    #Digraph = A.toarray()
+    A = nx.adjacency_matrix(DG)
+    digraph = A.toarray()
     if nx.is_strongly_connected(DG):        #calculate the diameter
         diameter = nx.diameter(DG)
         diameters.append(diameter)
     else:
         diameter = 'infinity' 
-    print(f'\n({Digraph}, {diameter})', file = f) 		#print the digraph-diameter pair
+    result.append((vector, digraph, diameter)) 		
+print(tabulate(result, headers=['Vector', 'Digraph', 'Diameter'], tablefmt = 'grid'), file = f)         #print the result
 if len(diameters) == 0:         #find the minimum
     print('\nAll the diameters are infinity', file = f)
 else:
