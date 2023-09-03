@@ -3,6 +3,7 @@ import itertools
 import matplotlib.pyplot as plt
 import time
 import functions
+import numpy as np 
 
 def n_cube1(n):
 	initial_time = time.time()
@@ -20,10 +21,32 @@ def n_cube1(n):
 	A = nx.adjacency_matrix(G)
 	B = A.todense()
 	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
-	f = open('matrix.txt', 'w')
+	f = open('matrix1.txt', 'w')
 	print(C, file = f)	
 	final_time = time.time()
 	time_taken  = final_time - initial_time
 	print('Time1 =', time_taken)	
 
-n_cube1(3)		
+def n_cube2(n):
+	initial_time = time.time()
+	group =[np.array(p) for p in itertools.product(range(2), repeat = n)]
+	generator_list = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+	generators = [np.array(l) for l in generator_list]
+	G = nx.DiGraph()
+	G.add_nodes_from([tuple(i) for i in group])
+	for generator in generators:
+		for tail in G.nodes:
+			head = (tail + generator) % 2
+			G.add_edge(tuple(tail), tuple(head))
+	G = functions.to_undirected(G)
+	A = nx.adjacency_matrix(G)
+	B = A.todense()
+	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
+	f = open('matrix2.txt', 'w')
+	print(C, file = f)
+	final_time = time.time()
+	time_taken  = final_time - initial_time
+	print('Time2 =', time_taken)
+
+n_cube1(3)	
+n_cube2(3)	
