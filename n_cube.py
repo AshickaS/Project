@@ -21,7 +21,7 @@ def n_cube1(n):
 	A = nx.adjacency_matrix(G)
 	B = A.todense()
 	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
-	f = open('matrix1.txt', 'w')
+	f = open(f'matrix1_n{n}.txt', 'w')
 	print(C, file = f)	
 	final_time = time.time()
 	time_taken  = final_time - initial_time
@@ -42,11 +42,9 @@ def n_cube2(n):
 	A = nx.adjacency_matrix(G)
 	B = A.todense()
 	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
-	f = open('matrix2.txt', 'w')
+	f = open(f'matrix2_n{n}.txt', 'w')
 	print(C, file = f)
 	final_time = time.time()
 	time_taken  = final_time - initial_time
 	print('Time2 =', time_taken)
 
-n_cube1(3)	
-n_cube2(3)	
