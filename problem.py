@@ -3,9 +3,7 @@ import numpy as np
 from tabulate import tabulate
 import random
 
-def minimum_diameter(input_file, sample_size, n1, n2): 
-    input_graph = np.loadtxt(input_file)      #load the input file
-    G = nx.Graph(input_graph)         #create a graph
+def minimum_diameter(G, sample_size, n1, n2): 
     m = G.number_of_edges()     #size of the graph
     n = G.number_of_nodes() 	#order of the graph
     f = open(f'output{n2}_{n1}.txt', 'w')
@@ -13,7 +11,9 @@ def minimum_diameter(input_file, sample_size, n1, n2):
     K = F.toarray()
     print(f'Input graph:\n\n {K}',file = f)         #print the input graph to the file
     print(f'The diameter of the input graph is {nx.diameter(G)}', file = f) 		#print the diameter
-    diameters = []      #create a list for diameters
+    min_diameter = float('inf')       #initialize the minimum diameter as infinity
+    min_vector = None
+    min_digraph = None
     result = []
     bit_vector_sample = []      #create a sample of bit vectors
     for i in range (sample_size):
@@ -34,13 +34,14 @@ def minimum_diameter(input_file, sample_size, n1, n2):
         digraph = A.toarray()
         if nx.is_strongly_connected(DG):        #calculate the diameter
             diameter = nx.diameter(DG)
-            diameters.append(diameter)
-        else:
-            diameter = 'infinity' 
-        result.append((vector, digraph, diameter)) 		
-    print(tabulate(result, headers=['Vector', 'Digraph', 'Diameter'], tablefmt = 'grid'), file = f)         #print the result
-    if len(diameters) == 0:         #find the minimum
-        print('\nAll the diameters are infinity', file = f)
+            if diameter < min_diameter:         #compare the diameters and update the result
+                min_diameter = diameter
+                min_vector = vector
+                min_digraph = digraph 
+                result.append((min_vector, min_digraph, min_diameter)) 	
+    if len(result) == 0:         #find the minimum
+        print('\nAll the diameters are infinity', file = f)	    
     else:
-        print(f'\nMinimum among the diameters is {min(diameters)}', file = f)
+        print(tabulate(result, headers=['Vector', 'Digraph', 'Diameter'], tablefmt = 'grid'), file = f)       #print the result
+        print(f'\nMinimum among the diameters is {min_diameter}', file = f)
 
