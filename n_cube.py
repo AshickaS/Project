@@ -18,14 +18,10 @@ def n_cube1(n):
 				head += str((int(tail[i]) + int(generator[i])) % 2)		
 			G.add_edge(tail, head)
 	G = functions.to_undirected(G)	
-	A = nx.adjacency_matrix(G)
-	B = A.todense()
-	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
-	f = open(f'matrix1_n{n}.txt', 'w')
-	print(C, file = f)	
 	final_time = time.time()
 	time_taken  = final_time - initial_time
-	print('Time1 =', time_taken)	
+	print('Time1 =', time_taken)
+	return G	
 
 def n_cube2(n):
 	initial_time = time.time()
@@ -39,12 +35,7 @@ def n_cube2(n):
 			head = (tail + generator) % 2
 			G.add_edge(tuple(tail), tuple(head))
 	G = functions.to_undirected(G)
-	A = nx.adjacency_matrix(G)
-	B = A.todense()
-	C = '\n'.join([' '.join([str(x) for x in row]) for row in B])
-	f = open(f'matrix2_n{n}.txt', 'w')
-	print(C, file = f)
 	final_time = time.time()
 	time_taken  = final_time - initial_time
 	print('Time2 =', time_taken)
-
+	return G
