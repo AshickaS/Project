@@ -3,17 +3,16 @@ import numpy as np
 from tabulate import tabulate
 import random
 
-def minimum_diameter(G, sample_size, n1, n2): 
+def minimum_diameter(G, sample_size, n1, n2):       #n1 denotes n value in n_cube, n2 denotes function number of n_cube1 or n_cube2  
     m = G.number_of_edges()     #size of the graph
-    n = G.number_of_nodes() 	#order of the graph
     f = open(f'output{n2}_{n1}.txt', 'w')
     F = nx.adjacency_matrix(G)      #create the adjacency matrix
     K = F.toarray()
     print(f'Input graph:\n\n {K}',file = f)         #print the input graph to the file
     print(f'The diameter of the input graph is {nx.diameter(G)}', file = f) 		#print the diameter
     min_diameter = float('inf')       #initialize the minimum diameter as infinity
-    min_vector = None
-    min_digraph = None
+    min_vector = None       #vector corresponding to minimum diameter
+    min_digraph = None      #digraph corresponding to minimum diameter
     result = []
     bit_vector_sample = []      #create a sample of bit vectors
     for i in range (sample_size):
@@ -23,7 +22,7 @@ def minimum_diameter(G, sample_size, n1, n2):
         bit_vector_sample.append(tuple(v))
     for vector in bit_vector_sample:
         DG = nx.DiGraph() 		#create a digraph for each vector
-        DG.add_nodes_from([i for i in range (n)])
+        DG.add_nodes_from(G)
         for edge, bit in zip(G.edges(), vector): 		#orient the graph
         #    print(edge, bit)
             if bit == 0:
