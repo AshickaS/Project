@@ -9,8 +9,8 @@ from n_cube import n_cube2
 The function eulerian_orientation() takes as input a graph G and returns an oriented digraph DG. 
 '''
 def eulerian_orientation(G):
-    D = G.copy()        #remove the vertices from this graph
-    DG = nx.DiGraph()       #add the vertices to this graph 
+    D = G.copy()        #remove the edges from this graph
+    DG = nx.DiGraph()       #add the edges to this graph 
     DG.add_nodes_from(G)
     V = list(G.nodes())     #vertex set of G
     while D.number_of_edges() > 0:
@@ -25,6 +25,42 @@ def eulerian_orientation(G):
             D.remove_edge(v, u)     #remove the edge from D
             v = u       #repeat the process at u
     return DG
+'''
+The function eulerian_orientation1() randomly selects a vertex v and checks for a ciruit starting and ending at v. The vertices along the ciruit are stored in a list C and the edges corresponding to them are oriented in the resultant graph DG. The remaiming edges are oriented randomly.
+'''
+def eulerian_orientation1(G):
+    D = G.copy()        #remove edges from this graph
+    DG = nx.DiGraph()       #add edges to this graph
+    V = list(G.nodes())     #V(G)
+    v = random.choice(V)        #select a random vertex
+    #print(v)
+    C = [v]     #circuit C
+    while True:
+        N = list(D.neighbors(v))        #N(v)
+        if N:
+            u = random.choice(N)        #select a random neighbor u
+            #print(u)
+            C.append(u)     #append u to C
+            D.remove_edge(v, u)     #remove the edge (v, u) from D
+            v = u
+            if v == C[0]:       #check if we have come back to the initial vertex
+                break
+        else:
+            C.pop()     #if no neighbors, remove the vertex from C
+            if not C:       #if C is empty, break the loop
+                break
+            D.add_edge(C[-1], v)        #add the removed edge back to D
+            v = C[-1]       #select a new neighbor and continue
+    #print(C)
+    for i in range(len(C) - 2):     #orient the edges of the circuit
+        DG.add_edge(C[i], C[i+1])
+    for edge in D.edges:        #orient the remaining edges randomly
+        if random.randint(0,1) == 0:
+            DG.add_edge(edge[0], edge[1])
+        else:
+            DG.add_edge(edge[1], edge[0])
+    return DG       #return the oriented graph
+
 '''
 The function eulerian orientation2() finds a cycle in G and orients it by a coin toss experiment. The remaining edges are randomly oriented.
 '''
