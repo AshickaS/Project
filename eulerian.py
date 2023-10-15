@@ -85,6 +85,51 @@ def eulerian_orientation2(G):
             DG.add_edge(edge[1], edge[0])
     return DG
 
+def eulerian_orientation3(G):
+    '''
+    The function eulerian_orientation3() finds the cycles in G and orient their edges by a coin toss experiment. The remaining edges are oriented such that the indegree outdegree difference in minimized.
+    '''
+    D = G.copy()        
+    DG = nx.DiGraph()      
+    V = list(G.nodes())     
+    num_cycles = 0
+    while True:
+        try:
+            nx.find_cycle(D)
+        except nx.exception.NetworkXNoCycle as e:
+            print("Found the no cycle exception after finding", num_cycles, " cycles")
+            print("Number of remaining edges = ", D.number_of_edges())
+            for edge in D.edges:        
+                if DG.in_degree(edge[0]) > DG.out_degree(edge[0]):
+                    DG.add_edge(edge[0], edge[1])
+                elif DG.in_degree(edge[0]) < DG.degree(edge[0]):
+                    DG.add_edge(edge[1], edge[0])
+                else:
+                    DG.add_edge(edge[0], edge[1])
+                    DG.add_edge(edge[1], edge[0])
+            return DG    
+           
+        while True:
+            v = random.choice(V)        
+            try:
+                C = nx.find_cycle(D,v)
+            except nx.exception.NetworkXNoCycle as e:
+                #print("No cycles from the chosen vertex")
+                continue    
+            #print("A vertex with a cycle found")
+            break
+        num_cycles += 1
+        #print("A cycle of length ", len(C), " found.")    
+        toss = random.randint(0,1)
+        if toss:
+            for e in C:     
+                DG.add_edge(e[0], e[1])
+                D.remove_edge(e[0], e[1])
+        else:
+            for e in C:     
+                DG.add_edge(e[1], e[0])
+                D.remove_edge(e[0], e[1])
+
 def maximum_matching_orientation(G):
     '''
     The function maximum_matching_orientation() finds a maximum matching M of the graph G and orients the edges in M randomly. Then it finds the cycles in G and orient their edges. 
