@@ -5,10 +5,11 @@ import networkx as nx
 import random
 from n_cube import n_cube2
 
-'''
-The function eulerian_orientation() takes as input a graph G and returns an oriented digraph DG. 
-'''
+
 def eulerian_orientation(G):
+    '''
+    The function eulerian_orientation() takes as input a graph G and returns an oriented digraph DG. 
+    '''
     D = G.copy()        #remove the edges from this graph
     DG = nx.DiGraph()       #add the edges to this graph 
     DG.add_nodes_from(G)
@@ -25,10 +26,11 @@ def eulerian_orientation(G):
             D.remove_edge(v, u)     #remove the edge from D
             v = u       #repeat the process at u
     return DG
-'''
-The function eulerian_orientation1() randomly selects a vertex v and checks for a ciruit starting and ending at v. The vertices along the ciruit are stored in a list C and the edges corresponding to them are oriented in the resultant graph DG. The remaiming edges are oriented randomly.
-'''
+
 def eulerian_orientation1(G):
+    '''
+    The function eulerian_orientation1() randomly selects a vertex v and checks for a ciruit starting and ending at v. The vertices along the ciruit are stored in a list C and the edges corresponding to them are oriented in the resultant graph DG. The remaiming edges are oriented randomly.
+    '''
     D = G.copy()        #remove edges from this graph
     DG = nx.DiGraph()       #add edges to this graph
     V = list(G.nodes())     #V(G)
@@ -61,10 +63,10 @@ def eulerian_orientation1(G):
             DG.add_edge(edge[1], edge[0])
     return DG       #return the oriented graph
 
-'''
-The function eulerian orientation2() finds a cycle in G and orients it by a coin toss experiment. The remaining edges are randomly oriented.
-'''
 def eulerian_orientation2(G):
+    '''
+    The function eulerian orientation2() finds a cycle in G and orients it by a coin toss experiment. The remaining edges are randomly oriented.
+    '''
     D = G.copy()
     DG = nx.DiGraph()
     DG.add_nodes_from(G)
@@ -82,10 +84,58 @@ def eulerian_orientation2(G):
         else:
             DG.add_edge(edge[1], edge[0])
     return DG
-'''
-The function minimum_diameter() calls the function eulerian_orientation() sample_size many times for the graph G, stores the corresponding diameters in a set and returns the minimum. 
-'''
+
+def maximum_matching_orientation(G):
+    '''
+    The function maximum_matching_orientation() finds a maximum matching M of the graph G and orients the edges in M randomly. Then it finds the cycles in G and orient their edges. 
+    '''
+    M = nx.algorithms.bipartite.maximum_matching(G)
+    DG = nx.DiGraph()
+    D1 = G.copy()
+    D2 = nx.Graph()
+    V = list(G.nodes())
+    num_cycles = 0
+    for key, value in M.items():
+        D2.add_edge(key, value)
+    for edge in D2.edges:
+        if random.randint(0,1) == 0:
+            DG.add_edge(edge[0], edge[1])
+        else:
+            DG.add_edge(edge[1], edge[0])
+        D1.remove_edge(edge[0], edge[1])
+    while True:
+        try:
+            nx.find_cycle(D1)
+        except nx.exception.NetworkXNoCycle as e:
+            print("Found the no cycle exception after finding", num_cycles, " cycles")
+            print("Number of remaining edges = ", D1.number_of_edges())
+            return DG       
+        while True:
+            v = random.choice(V)        #select a random vertex
+            try:
+                C = nx.find_cycle(D1,v)
+            except nx.exception.NetworkXNoCycle as e:
+                #print("No cycles from the chosen vertex")
+                continue    
+            #print("A vertex with a cycle found")
+            break
+
+        num_cycles += 1
+        #print("A cycle of length ", len(C), " found.")    
+        toss = random.randint(0,1)
+        if toss:
+            for e in C:     
+                DG.add_edge(e[0], e[1])
+                D1.remove_edge(e[0], e[1])
+        else:
+            for e in C:     
+                DG.add_edge(e[1], e[0])
+                D1.remove_edge(e[0], e[1])
+
 def minimum_diameter(G, sample_size):
+    '''
+    The function minimum_diameter() calls the function eulerian_orientation() sample_size many times for the graph G, stores the corresponding diameters in a set and returns the minimum. 
+    '''
     diameters = set()
     for i in range(sample_size):
         diameter = nx.diameter(eulerian_orientation(G))      #calculate the diameter sample size many timess
