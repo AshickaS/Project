@@ -5,13 +5,11 @@ import networkx as nx
 import random
 import time
 from n_cube import n_cube2
-from star_graph import n_star
 
 def random_walk_orientation(G):
     '''
     The function random_walk_orientation() takes as input a graph G and returns an oriented digraph DG. 
     '''
-    t1 = time.time()
     D = G.copy()        #remove the edges from this graph
     DG = nx.DiGraph()       #add the edges to this graph 
     DG.add_nodes_from(G)
@@ -27,16 +25,12 @@ def random_walk_orientation(G):
             DG.add_edge(v, u)       #add edge to resultant digraph DG
             D.remove_edge(v, u)     #remove the edge from D
             v = u       #repeat the process at u
-    t2 = time.time()
-    t = t2 - t1
-    print('Time taken for random walk orientation is', t)
     return DG
     
 def eulerian_orientation_with_cycles(G):
     '''
     The function eulerian_orientation_with_cycles() finds the cycles in G and orient their edges by a coin toss experiment. The remaining edges are oriented randomly.
     '''
-    t1 = time.time()
     D = G.copy()        
     DG = nx.DiGraph()      
     V = list(G.nodes())     
@@ -49,9 +43,6 @@ def eulerian_orientation_with_cycles(G):
                     DG.add_edge(edge[0], edge[1])
                 else:
                     DG.add_edge(edge[1], edge[0])
-            t2 = time.time()
-            t = t2 - t1
-            print('Time taken for eulerian orientation is', t)
             return DG           
         while True:
             v = random.choice(V)        
@@ -74,7 +65,6 @@ def maximum_matching_orientation(G):
     '''
     The function maximum_matching_orientation() finds a maximum matching M of the graph G and orients the edges in M randomly. Then it finds the cycles in G and orient their edges. 
     '''
-    t1 = time.time()
     M = nx.algorithms.bipartite.maximum_matching(G)
     DG = nx.DiGraph()
     D1 = G.copy()
@@ -95,9 +85,6 @@ def maximum_matching_orientation(G):
         try:
             nx.find_cycle(D1)
         except nx.exception.NetworkXNoCycle as e:
-            t2 = time.time()
-            t = t2 - t1
-            print('Time taken for maximum matching orientation is', t)
             return DG       
         while True:
             v = random.choice(V)        
@@ -118,27 +105,29 @@ def maximum_matching_orientation(G):
 
 def minimum_diameter(G, sample_size, orientation):
     '''
-    The function minimum_diameter() calls the function orientation sample_size many times for the graph G, stores the corresponding diameters in a set and returns the minimum. 
+    The function minimum_diameter() calls the function orientation sample_size many times for the graph G, stores the corresponding diameters in a set and returns the minimum and the diameter of the input graph. 
     '''
-    t1 = time.time()
     diameters = set()
-    K = orientation(G)
-    if K != None:
-        for i in range(sample_size):
-            diameter = float('inf')
-            if nx.is_strongly_connected(K):
-                diameter = nx.diameter(K)      #calculate the diameter sample size many times
-            diameters.add(diameter)     #store the diameters
+    for i in range(sample_size):
+        #diameter = float('inf')
+        t1 = time.time()
+        K = orientation(G)
         t2 = time.time()
-        t = t2 - t1
-        print('Time taken to calculate the diameter is', t)
-        return nx.diameter(G), min(diameters)       #return the minimum diameter
-    
-#G = n_cube2(4)
-G = n_star(8)
-sample_size = 10
-orientation = maximum_matching_orientation
-print(minimum_diameter(G, sample_size, orientation))
+        print('Time taken to orient is', t2-t1)
+        if K != None:
+            if nx.is_strongly_connected(K):
+                t1 = time.time()
+                diameter = nx.diameter(K)  
+                t2 = time.time()
+                print('Time taken to calculate diameter is', t2-t1, diameter)
+                diameters.add(diameter)    
+    return nx.diameter(G), min(diameters)       
+
+#G = n_star(8)
+# G = oriented_n_star(9)
+# sample_size = 1
+# orientation = random_walk_orientation
+# print(minimum_diameter(G, sample_size, orientation))
 
  
 
