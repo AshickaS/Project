@@ -1,10 +1,5 @@
-'''
-This program calculates the minimum diameter of n-cube by its eulerian orientation.
-'''
 import networkx as nx
 import random
-import time
-from n_cube import n_cube2
 
 def random_walk_orientation(G):
     '''
@@ -103,31 +98,14 @@ def maximum_matching_orientation(G):
                 DG.add_edge(edge[1], edge[0])
                 D1.remove_edge(edge[0], edge[1])
 
-def minimum_diameter(G, sample_size, orientation):
+
+
+def approximate_diameter(G, sample_size):
     '''
-    The function minimum_diameter() calls the function orientation sample_size many times for the graph G, stores the corresponding diameters in a set and returns the minimum and the diameter of the input graph. 
+    The function approximate_diameter() calculates the eccentricites of a random sample of vertices and returns their maximum.
     '''
-    diameters = set()
-    for i in range(sample_size):
-        #diameter = float('inf')
-        t1 = time.time()
-        K = orientation(G)
-        t2 = time.time()
-        print('Time taken to orient is', t2-t1)
-        if K != None:
-            if nx.is_strongly_connected(K):
-                t1 = time.time()
-                diameter = nx.diameter(K)  
-                t2 = time.time()
-                print('Time taken to calculate diameter is', t2-t1, diameter)
-                diameters.add(diameter)    
-    return nx.diameter(G), min(diameters)       
-
-#G = n_star(8)
-# G = oriented_n_star(9)
-# sample_size = 1
-# orientation = random_walk_orientation
-# print(minimum_diameter(G, sample_size, orientation))
-
- 
-
+    V = list(G.nodes())
+    sample_nodes = random.sample(V, sample_size)
+    eccentricities = nx.eccentricity(G, sample_nodes)
+    diameter = max(eccentricities.values())
+    return diameter
