@@ -1,8 +1,8 @@
 import networkx as nx
 import itertools
 import relabel
-import time
 import matplotlib.pyplot as plt
+from sympy.combinatorics.permutations import Permutation
 from eulerian import eulerian_orientation_with_cycles
 
 
@@ -31,6 +31,28 @@ def oriented_n_star(n):
 		G.add_node(labels[0])
 		return G
 	
+	if n == 4:
+		nodes = [''.join(p) for p in itertools.permutations(labels[:4], 4)]
+		G.add_nodes_from(nodes)
+		signature = dict()
+		for node in G.nodes:
+			per = [ord(i) - ord('a') for i in node] 
+			sgn = Permutation(per).signature()
+			signature[node] = sgn
+		for node in G.nodes:
+			if signature[node] == 1:
+				nbr1 = node[1] + node[0] + node[2:]
+				nbr2 = node[-2::-1] + node[-1]
+				if nbr1 in G.nodes:
+					G.add_edge(node, nbr1)
+				if nbr2 in G.nodes:
+					G.add_edge(node, nbr2)
+			else:
+				nbr = node[-1] + node[1:-1] + node[0]
+				if nbr in G.nodes:
+					G.add_edge(node, nbr)
+		return G 
+
 	G_prev = oriented_n_star(n - 2)
 	G_copies = [G_prev.copy() for i in range (n*(n - 1))]
 	s1_list = [list(G_prev.nodes) for G_prev in G_copies]
