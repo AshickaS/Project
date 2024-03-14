@@ -100,16 +100,26 @@ def maximum_matching_orientation(G):
 
 def path(DG, s, t):
     '''
-    The function path() takes as input a graph DG and two vertices s and t. It finds the shortest path from s to t, orient the edges of DG in this direction and finds the shortest path from t to s in the updated graph and orient the edges of DG in the direction of this new path. The function returns the combined path.
+    The function path() takes as input a graph DG and two vertices s and t. It
+    checks if the shortest path length from s to t is greater than 1000, and
+    if so, returns an empty list. Otherwise, it finds the shortest path from s 
+    to t, orients the edges of DG in this direction, assigns them weight and
+    finds the shortest path from t to s in the updated graph and orients the
+    edges of DG in the direction of this new path. The function returns the
+    combined path.
     '''
+    if nx.shortest_path_length(DG, s, t, weight='weight') > 1000:
+        return []
     p1 = nx.dijkstra_path(DG, s, t)
     for i in range(len(p1) - 1):
         if ((p1[i+1],p1[i]) in DG.edges()):
             DG.remove_edge(p1[i+1], p1[i])
+            DG[p1[i]][p1[i+1]]['weight'] = 1000
     p2 = nx.dijkstra_path(DG, t, s)
     for i in range(len(p2) - 1):
         if (p2[i+1], p2[i]) in DG.edges():
             DG.remove_edge(p2[i+1], p2[i])
+            DG[p2[i]][p2[i+1]]['weight'] = 1000
     return p1+p2[1:]
 
 def approximate_diameter(G, sample_size):
