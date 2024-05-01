@@ -173,6 +173,38 @@ def initial_max_cycle_orientation(G):
         if nx.number_of_edges(K) <= nx.number_of_edges(G):
             return K
 
+def max_cycle_orientation(G):
+	K = nx.DiGraph(G)
+	count = 0
+	processed_pairs = set()
+	while nx.number_of_edges(K) > nx.number_of_edges(G):
+		path_lengths = nx.all_pairs_dijkstra_path_length(K,1000)
+		path_lengths_dict = {}
+		for u, u_dict in path_lengths:
+			path_lengths_dict_u = {(u,v): u_dict[v] for v in u_dict \
+						  		    if (u, v) not in processed_pairs}
+			path_lengths_dict.update(path_lengths_dict_u)
+
+		path_length_dict_bidir = dict()
+		for (u,v) in path_lengths_dict:
+			if (v,u) in path_lengths_dict:
+				path_length_dict_bidir[(u,v)] = path_lengths_dict[(u,v)]
+	
+		path_lengths_list_bidr = list(path_length_dict_bidir.items())#
+		random.shuffle(path_lengths_list_bidr)
+		path_lengths_dict_shuffled = dict(path_lengths_list_bidr)#
+		sorted_pairs = sorted(path_lengths_dict_shuffled.items(), 
+							key=lambda item: item[1], reverse=True)
+
+		(u, v), d = sorted_pairs[0]
+		P = path(K, u, v)
+		
+		count += 1
+		processed_pairs.add((u, v))
+		processed_pairs.add((v, u))
+	
+	return K
+
 def max_dist_pair_path(DG,s,t):
     '''
     The function max_dist_pair_path() takes as input a graph DG and two
