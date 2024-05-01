@@ -148,6 +148,31 @@ def maximum_distance_pair_orientation(G):
         if nx.number_of_edges(K) == nx.number_of_edges(G):
             return K
 
+def initial_max_cycle_orientation(G):
+    '''
+    The function initial_max_cycle_orientation() takes as input a graph G and
+    creates a dictionary of vertex pair and their distances. The dictionary is
+    shuffled and sorted in non increasing order of distances. The edges are
+    oriented taking the pair of vertices from the dictionary as defined by the
+    path() function. The function returns the oriented graph of G.
+    '''
+    count = 0
+    path_lengths = nx.all_pairs_shortest_path_length(G)
+    path_lengths_dict = {(u, v): d for u, paths in path_lengths \
+                                for v, d in paths.items()}
+    path_lengths_list = list(path_lengths_dict.items())
+    random.shuffle(path_lengths_list)
+    path_lengths_dict_shuffled = dict(path_lengths_list)
+    sorted_pairs = sorted(path_lengths_dict_shuffled.items(), 
+                          key=lambda item: item[1], reverse=True)
+    K = nx.DiGraph(G)
+    for (u, v), d in sorted_pairs:
+        P = path(K, u, v)
+        #print(count, nx.diameter(K), len(P)-1, nx.is_eulerian(K))
+        count += 1
+        if nx.number_of_edges(K) <= nx.number_of_edges(G):
+            return K
+
 def max_dist_pair_path(DG,s,t):
     '''
     The function max_dist_pair_path() takes as input a graph DG and two
