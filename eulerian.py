@@ -131,6 +131,42 @@ def maximum_matching_orientation(G):
                 DG.add_edge(edge[1], edge[0])
                 D1.remove_edge(edge[0], edge[1])
 
+def maximum_distance_pair_orientation(G):
+    '''
+    The maximum_distance_pair_orientation() takes as input a graph and orients
+    the edges between two pairs of vertices selected randomly in the direction
+    of longer path between these two vertices. The function returns the final 
+    oriented graph.
+    '''
+    K = nx.DiGraph(G)
+    V = list(G.nodes())
+    pairs = list(itertools.combinations(V,2))
+    random.shuffle(pairs)
+    for u,v in pairs:
+        ori_path = max_dist_pair_path(K, u, v)
+		#print(nx.diameter(K),nx.number_of_edges(K), nx.is_eulerian(K))
+        if nx.number_of_edges(K) == nx.number_of_edges(G):
+            return K
+
+def max_dist_pair_path(DG,s,t):
+    '''
+    The function max_dist_pair_path() takes as input a graph DG and two
+    vertices s and t and orients the edges from either s to t or from t to s
+    according as which one is longer. The function returns the desired path. 
+    '''
+    st_path = nx.shortest_path(DG,s,t)
+    ts_path = nx.shortest_path(DG,t,s)
+    if len(st_path) > len(ts_path):
+        for i in range(len(st_path) - 1):
+            if ((st_path[i+1],st_path[i]) in DG.edges()):
+                DG.remove_edge(st_path[i+1], st_path[i])
+        return st_path
+    else:
+        for i in range(len(ts_path) - 1):
+            if ((ts_path[i+1],ts_path[i]) in DG.edges()):
+                DG.remove_edge(ts_path[i+1], ts_path[i])
+        return ts_path
+
 def path(DG, s, t):
     '''
     The function path() takes as input a graph DG and two vertices s and t. It
