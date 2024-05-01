@@ -1,9 +1,11 @@
 import networkx as nx
 import random
+import itertools
 
 def random_walk_orientation(G):
     '''
-    The function random_walk_orientation() takes as input a graph G and returns an oriented digraph DG. 
+    The function random_walk_orientation() takes as input a graph G orients
+    the edges randomly and returns an oriented digraph DG of G. 
     '''
     D = G.copy()        #remove the edges from this graph
     DG = nx.DiGraph()       #add the edges to this graph 
@@ -21,10 +23,39 @@ def random_walk_orientation(G):
             D.remove_edge(v, u)     #remove the edge from D
             v = u       #repeat the process at u
     return DG
-    
+
+def random_walk_orientation_new(G):
+    '''
+    The function random_walk_orientation_new() takes as input a graph G and
+    orients the edges by selecting a random walk prefering the non visited
+    vertices. The function returns an oriented graph of G.
+    '''
+    D = G.copy()        #remove the edges from this graph
+    DG = nx.DiGraph()       #add the edges to this graph 
+    DG.add_nodes_from(G)
+    V = list(G.nodes())     #vertex set of G
+    visited = {v: False for v in V}     #dictionary to keep track of visited vertices
+    while D.number_of_edges() > 0:
+        v = random.choice(V)        #select a random vertex in G
+        visited[v] = True
+        while True:
+            N = [u for u in D.neighbors(v) if not visited[u]]        #N(v) excluding visited vertices
+            if len(N) == 0:     #if N(v) is empty, select from visited vertices
+                N = list(D.neighbors(v))
+                if len(N) == 0:     #break the loop if N(v) is still empty
+                    break
+            u = random.choice(N)        #select a random neighbour of v
+            visited[u] = True
+            DG.add_edge(v, u)       #add edge to resultant digraph DG
+            D.remove_edge(v, u)     #remove the edge from D
+            v = u       #repeat the process at u
+    return DG
+
 def eulerian_orientation_with_cycles(G):
     '''
-    The function eulerian_orientation_with_cycles() finds the cycles in G and orient their edges by a coin toss experiment. The remaining edges are oriented randomly.
+    The function eulerian_orientation_with_cycles() finds the cycles in G and
+    orient their edges by a coin toss experiment. The remaining edges are
+    oriented randomly.
     '''
     D = G.copy()        
     DG = nx.DiGraph()      
@@ -58,7 +89,9 @@ def eulerian_orientation_with_cycles(G):
     
 def maximum_matching_orientation(G):
     '''
-    The function maximum_matching_orientation() finds a maximum matching M of the graph G and orients the edges in M randomly. Then it finds the cycles in G and orient their edges. 
+    The function maximum_matching_orientation() finds a maximum matching M of
+    the graph G and orients the edges in M randomly. Then it finds the cycles
+    in G and orient their edges. 
     '''
     M = nx.algorithms.bipartite.maximum_matching(G)
     DG = nx.DiGraph()
