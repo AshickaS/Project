@@ -14,7 +14,6 @@ def random_walk_orientation(G):
 	while D.number_of_edges() > 0:
 		v = random.choice(V)        #select a random vertex in G
 		while True:
-			#print(v)
 			N = list(D.neighbors(v))        #N(v)
 			if len(N) == 0:     #break the loop if N(v) is empty
 				break
@@ -238,10 +237,13 @@ def max_cycle_orientation(G):
 
 def random_pair_max_dist_orientation(G):
 	'''
-	The function random_pair_max_dist_orientation() takes as input a graph G and creates a digraph K of G. Selects 10 random vertices and its 10 random neighbours in each iteration. Calculates the maximum distance between these vertex-neighbour pairs and orient the edges returned by the function path() between a vertex-neighbour pair with maximum distance.
+	The function random_pair_max_dist_orientation() takes as input a graph G
+	and creates a digraph K of G. Selects 10 random vertices and its 10 random
+	neighbours in each iteration. Calculates the maximum distance between
+	these vertex-neighbour pairs and orient the edges returned by the function
+	path() between a vertex-neighbour pair with maximum distance.
 	'''
 	K = nx.DiGraph(G)
-	count = 0
 	processed_pairs = set()
 	while nx.number_of_edges(K) > nx.number_of_edges(G):
 		
@@ -317,7 +319,8 @@ def path(DG, s, t):
 
 def approximate_diameter(G, sample_size):
 	'''
-	The function approximate_diameter() calculates the eccentricites of a random sample of vertices and returns their maximum.
+	The function approximate_diameter() calculates the eccentricites of a
+	random sample of vertices and returns their maximum.
 	'''
 	V = list(G.nodes())
 	sample_nodes = random.sample(V, sample_size)
