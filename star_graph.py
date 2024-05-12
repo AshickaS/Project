@@ -1,7 +1,7 @@
 import networkx as nx
 import itertools
 import relabel
-import matplotlib.pyplot as plt
+import random
 from sympy.combinatorics.permutations import Permutation
 from eulerian import eulerian_orientation_with_cycles
 
@@ -55,6 +55,9 @@ def oriented_n_star(n):
 
 	G_prev = oriented_n_star(n - 2)
 	G_copies = [G_prev.copy() for i in range (n*(n - 1))]
+	for G in G_copies:
+		if(random.randint(0,1) == 1):
+			G.reverse()
 	s1_list = [list(G_prev.nodes) for G_prev in G_copies]
 	s2_list = [''.join(p) for p in itertools.permutations(labels[:n], 2)]
 	relabeled_copies = [nx.relabel_nodes(G_copy,
